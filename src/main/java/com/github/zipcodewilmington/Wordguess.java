@@ -88,13 +88,13 @@ public class Wordguess {
         boolean playAgain = true;
 
         while (playAgain) {
-            // Choose a random word
+
             secretWord = words[random.nextInt(words.length)].toCharArray();
             maxTries = secretWord.length;
             playerGuesses = new char[secretWord.length];
             initializeGameState();
 
-            // Game loop
+
             while (remainingTries > 0 && !isWordGuessed()) {
                 printCurrentState();
                 System.out.println("You have " + remainingTries + " tries left.");
@@ -103,18 +103,18 @@ public class Wordguess {
                 process(guess);
             }
 
-            // Game over message
+
             if (isWordGuessed()) {
                 playerWon();
             } else {
                 playerLost();
             }
 
-            // Ask to play again
+
             playAgain = askToPlayAgain(scanner);
         }
 
-        gameOver(); // Display "game over" message
+        gameOver(); //
         scanner.close();
     }
 
