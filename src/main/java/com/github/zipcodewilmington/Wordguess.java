@@ -5,84 +5,51 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Wordguess {
-    public static String[] words = {"house", "apartment", "villa", "condo"};
-    public static Random random = new Random();
-    public static Scanner scanner = new Scanner(System.in);
+    public String[] words = {"red", "blue", "green", "yellow", "black"};
+    public char[] secretWord;
+    public char[] playerGuesses;
+    public int maxTries;
+    public int remainingTries;
+    public Scanner scanner;
+    public Random random;
 
-    public static void main(String[] args) {
-
-        System.out.println("Let's Play Wordguess version 1.0!");
-        boolean playAgain = true;
-        while (playAgain) {
-
-            String secretWord = words[random.nextInt(words.length)];
-            char[] playerGuesses = new char[secretWord.length()];
-
-
-            for (int i = 0; i < playerGuesses.length; i++) {
-                playerGuesses[i] = '_';
-            }
-
-            int maxTries = secretWord.length();
-            int remainingTries = maxTries;
-
-
-            while (remainingTries > 0 && !isWordGuessed(playerGuesses)) {
-                displayCurrentState(playerGuesses, remainingTries);
-
-
-                char guess = getNextGuess();
-
-
-                boolean foundLetter = false;
-                for (int i = 0; i < secretWord.length(); i++) {
-                    if (secretWord.charAt(i) == guess) {
-                        playerGuesses[i] = guess;
-                        foundLetter = true;
-                    }
-                }
-
-                if (!foundLetter) {
-                    remainingTries--;
-                    System.out.println("Letter '" + guess + "' is not in the word.");
-                }
-            }
-
-
-            if (isWordGuessed(playerGuesses)) {
-                System.out.println("Congratulations, You Won! The word was: " + secretWord);
-            } else {
-                System.out.println("You Lost! The word was: " + secretWord);
-            }
-
-
-            System.out.print("Would you like to play again? (yes/no): ");
-            String response = scanner.next();
-            playAgain = response.equals("yes");
-        }
-
-
-        System.out.println("Game Over.");
-        scanner.close();
+    public Wordguess() {
+        scanner = new Scanner(System.in);
+        random = new Random();
     }
 
+    public void initializeGameState() {
+        for (int i = 0; i < playerGuesses.length; i++) {
+            playerGuesses[i] = '_';
+        }
+        remainingTries = maxTries;
+    }
 
-    private static void displayCurrentState(char[] playerGuesses, int remainingTries) {
+    private void process(char guess) {
+        boolean correctGuess = false;
+        for (int i = 0; i < secretWord.length; i++) {
+            if (secretWord[i] == guess) {
+                playerGuesses[i] = guess;
+                correctGuess = true;
+            }
+        }
+        if (!correctGuess) {
+            remainingTries--;
+        }
+    }
+
+    public void printCurrentState() {
         System.out.print("Current Guesses: ");
-        for (char guess : playerGuesses) {
-            System.out.print(guess + " ");
-        }
-        System.out.println("\nYou have " + remainingTries + " tries left.");
+        printArray(playerGuesses);
+        System.out.println();
     }
 
-
-    private static char getNextGuess() {
+    public char getNextGuess(Scanner scanner) {
         System.out.print("Enter a single character: ");
         return scanner.next().charAt(0);
     }
 
-
-    private static boolean isWordGuessed(char[] playerGuesses) {
+    public boolean isWordGuessed () {
         for (char guess : playerGuesses) {
             if (guess == '_') {
                 return false;
@@ -90,7 +57,80 @@ public class Wordguess {
         }
         return true;
     }
+
+    public boolean askToPlayAgain(Scanner scanner) {
+        System.out.print("Would you like to play again? (yes/no): ");
+        String response = scanner.next();
+        return response.equals("yes");
+    }
+
+    public void gameOver() {
+        System.out.println("Game Over.");
+    }
+
+    public void playerWon() {
+        printCurrentState();
+        System.out.println(" Congratulations, You Won!");
+    }
+
+    public void playerLost () {
+        printCurrentState();
+        System.out.println(":-( :-( :-(\nYou Lost! You ran out of guesses. The word was: " + String.valueOf(secretWord));
+    }
+
+    public void printArray (char[] array) {
+        for (char c : array) {
+            System.out.print(c + " ");
+        }
+    }
+
+    public void runGame() {
+        boolean playAgain = true;
+
+        while (playAgain) {
+            // Choose a random word
+            secretWord = words[random.nextInt(words.length)].toCharArray();
+            maxTries = secretWord.length;
+            playerGuesses = new char[secretWord.length];
+            initializeGameState();
+
+            // Game loop
+            while (remainingTries > 0 && !isWordGuessed()) {
+                printCurrentState();
+                System.out.println("You have " + remainingTries + " tries left.");
+                char guess = getNextGuess(scanner);
+
+                process(guess);
+            }
+
+            // Game over message
+            if (isWordGuessed()) {
+                playerWon();
+            } else {
+                playerLost();
+            }
+
+            // Ask to play again
+            playAgain = askToPlayAgain(scanner);
+        }
+
+        gameOver(); // Display "game over" message
+        scanner.close();
+    }
+
+    public static void main(String [] args) {
+        Wordguess game = new Wordguess();
+        game.runGame();
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
-
-
-
